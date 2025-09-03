@@ -1,40 +1,94 @@
 <template>
   <Layout>
-    <div class=" mt-3 card flex items-center">
+    <!-- Input para nueva tarea -->
+    <div class="mt-5 card flex justify-center items-center gap-7">
       <FloatLabel>
-        <InputText id="over_label" size="small" v-model="value1" />
+        <InputText id="over_label" size="small" v-model="taskName" />
         <label for="over_label">Add new task</label>
       </FloatLabel>
-      <Button label="Create task" />
+      <Button
+        size="small"
+        label="Create task"
+        severity="info"
+        @click="createTask"
+        :disabled="todoStore.loading"
+      />
     </div>
 
-    <div class="no-result">
+    <!-- Mensaje cuando no hay tareas -->
+    <div class="no-result mt-5 justify-center" v-if="todoStore.tasks.length === 0">
       <strong>No item layout...</strong>
     </div>
 
-    <template>
-      <div class="task-container">
-        <div class="card-task">
-          <InputText type="checkbox" class="card-task_checkbox" />
+    <!-- Lista de tareas -->
+    <div class="w-full mt-5" v-else>
+      <div
+        v-for="task in todoStore.tasks"
+        :key="task.id"
+        class="card-task bg-gray-200 rounded-md p-4 mb-4 flex items-center"
+        :class="{ done: task.done }"
+      >
+        <!-- Checkbox de PrimeVue -->
+        <Checkbox
+          :model-value="task.done"
+          @update:model-value="updateTask(task.id!)"
+          binary
+          class="mr-2"
+        />
 
-          <strong class="card-task_name"></strong>
+        <!-- Nombre tarea -->
+        <strong class="ml-4 uppercase" :class="{ 'line-through': task.done }">
+          {{ task.name }}
+        </strong>
 
-          <button type="button" class="card-task_button">x</button>
-        </div>
+        <!-- Botón eliminar -->
+        <button
+          type="button"
+          class="ml-auto text-red-500 font-bold hover:text-red-700"
+          @click="deleteTask(task.id!)"
+        >
+          x
+        </button>
       </div>
-    </template>
+    </div>
 
-    <div class="loading-container">
+    <!-- Loading -->
+    <div class="loading-container mt-5" v-if="todoStore.loading">
       <strong>Loading...</strong>
     </div>
   </Layout>
 </template>
-<script setup>
+
+<script setup lang="ts">
+import { defineComponent, ref } from "vue";
 import Layout from "./layouts/Default.vue";
 import Button from "primevue/button";
 import InputText from "primevue/inputtext";
-import FloatLabel from "primevue/FloatLabel";
-import { ref } from "vue";
+import FloatLabel from "primevue/floatlabel";
+import Checkbox from "primevue/checkbox";
+import { useTodoStore } from "./store/todo";
 
-const value = ref(null);
+const taskName = ref();
+const todoStore = useTodoStore();
+
+const createTask = () => {
+  todoStore.addTask(taskName.value);
+  taskName.value = "";
+};
+
+const deleteTask = (id: string) => {
+    todoStore.deletedTask(id)
+}
+
+const updateTask = (id: string) => {
+  todoStore.updateTask(id)
+}
+
+
 </script>
+
+<style scoped>
+.done strong {
+  text-decoration: line-through;
+}
+</style>
