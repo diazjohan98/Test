@@ -1,11 +1,11 @@
 <template>
   <Layout>
-    <div class="card flex justify-center">
+    <div class=" mt-3 card flex items-center">
       <FloatLabel>
-        <InputText id="over_label" v-model="value1" />
-        <label for="over_label">Over Label</label>
+        <InputText id="over_label" size="small" v-model="value1" />
+        <label for="over_label">Add new task</label>
       </FloatLabel>
-      <Button label="Submit" />
+      <Button label="Create task" />
     </div>
 
     <div class="no-result">
